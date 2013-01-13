@@ -206,18 +206,6 @@ ssize_t SensorDevice::poll(sensors_event_t* buffer, size_t count) {
              * for the number of requested samples to fill, and deliver
              * it immediately */
             if (sensorType == SENSOR_TYPE_PROXIMITY) {
-#ifdef FOXCONN_SENSORS
-            /* Fix ridiculous API breakages from FIH. */
-            /* These idiots are returning -1 for FAR, and 1 for NEAR */
-                if (buffer[pollsDone].distance > 0) {
-                    buffer[pollsDone].distance = 0;
-                } else {
-                    buffer[pollsDone].distance = 1;
-                }
-#elif defined(PROXIMITY_LIES)
-                if (buffer[pollsDone].distance >= PROXIMITY_LIES)
-            buffer[pollsDone].distance = maxRange;
-#endif
                 return pollsDone+1;
             } else if (sensorType == SENSOR_TYPE_LIGHT) {
                 return pollsDone+1;
