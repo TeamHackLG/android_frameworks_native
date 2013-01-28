@@ -106,7 +106,9 @@ SurfaceFlinger::SurfaceFlinger()
         mLastSwapBufferTime(0),
         mDebugInTransaction(0),
         mLastTransactionTime(0),
-        mBootFinished(false)
+        mBootFinished(false),
+        mUseDithering(0),
+        mPrefer16bpp(0)
 {
     ALOGI("SurfaceFlinger is starting");
 
@@ -127,6 +129,13 @@ SurfaceFlinger::SurfaceFlinger()
             mDebugDDMS = 0;
         }
     }
+
+    property_get("persist.sys.use_dithering", value, "1");
+    mUseDithering = atoi(value);
+
+    property_get("persist.sys.prefer_16bpp", value, "1");
+    mPrefer16bpp = atoi(value);
+
     ALOGI_IF(mDebugRegion, "showupdates enabled");
     ALOGI_IF(mDebugDDMS, "DDMS debugging enabled");
 
@@ -2068,7 +2077,10 @@ status_t SurfaceFlinger::createNormalLayer(const sp<Client>& client,
 #ifdef NO_RGBX_8888
         format = PIXEL_FORMAT_RGB_565;
 #else
-        format = PIXEL_FORMAT_RGBX_8888;
+        if (mPrefer16bpp)
+            format = PIXEL_FORMAT_RGB_565;
+        else
+            format = PIXEL_FORMAT_RGBX_8888;
 #endif
         break;
     }
