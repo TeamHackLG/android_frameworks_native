@@ -66,6 +66,10 @@ ifeq ($(BOARD_ADRENO_DECIDE_TEXTURE_TARGET),true)
     LOCAL_CFLAGS += -DDECIDE_TEXTURE_TARGET
 endif
 
+ifeq ($(call is-vendor-board-platform,QCOM),true)
+	LOCAL_CFLAGS += -DUSE_NATIVE_FENCE_SYNC
+endif
+
 include $(BUILD_SHARED_LIBRARY)
 
 ifeq (,$(ONE_SHOT_MAKEFILE))
