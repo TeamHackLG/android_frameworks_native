@@ -64,8 +64,12 @@ endif
 
 ifeq ($(call is-vendor-board-platform,QCOM),true)
 ifneq ($(TARGET_QCOM_DISPLAY_VARIANT),legacy)
-	LOCAL_CFLAGS += -DUSE_NATIVE_FENCE_SYNC
+        LOCAL_CFLAGS += -DUSE_NATIVE_FENCE_SYNC
 endif
+endif
+
+ifeq ($(TARGET_USES_FENCE_SYNC),true)
+	LOCAL_CFLAGS += -DUSE_NATIVE_FENCE_SYNC
 endif
 
 include $(BUILD_SHARED_LIBRARY)
