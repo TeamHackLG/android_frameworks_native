@@ -334,10 +334,10 @@ private:
     static EGLContext createGLContext(EGLDisplay disp, EGLConfig config);
     void initializeGL(EGLDisplay display);
     uint32_t getMaxTextureSize() const;
-    uint32_t getMaxViewportDims() const;
     uint32_t getMinColorDepth() const;
+    uint32_t getMaxViewportDims() const;
 
-    // 0: surface doesn't need dithering, 1: use if necessary, 2: use permanently
+    // 0: surface doesn't need dithering, 1: use if necessary
     inline int getUseDithering() const { return mUseDithering; }
 
     /* ------------------------------------------------------------------------

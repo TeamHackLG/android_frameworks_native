@@ -68,6 +68,7 @@ Layer::Layer(SurfaceFlinger* flinger, const sp<Client>& client,
         mFormat(PIXEL_FORMAT_NONE),
         mGLExtensions(GLExtensions::getInstance()),
         mOpaqueLayer(true),
+        mNeedsDithering(false),
         mTransactionFlags(0),
         mQueuedFrames(0),
         mCurrentTransform(0),
@@ -77,7 +78,6 @@ Layer::Layer(SurfaceFlinger* flinger, const sp<Client>& client,
         mFrameLatencyNeeded(false),
         mFiltering(false),
         mNeedsFiltering(false),
-        mNeedsDithering(false),
         mSecure(false),
         mProtectedByApp(false),
         mHasSurface(false),
@@ -205,21 +205,12 @@ status_t Layer::setBuffers( uint32_t w, uint32_t h,
     mSurfaceFlingerConsumer->setDefaultBufferFormat(format);
     mSurfaceFlingerConsumer->setConsumerUsageBits(getEffectiveUsage(0));
 
-    int displayMinColorDepth;
-    int layerRedsize;
-    switch (mFlinger->getUseDithering()) {
-    case 0:
-        mNeedsDithering = false;
-        break;
-    case 1:
-        displayMinColorDepth = mFlinger->getMinColorDepth();
+    if (mFlinger->getUseDithering()) {
+        int displayMinColorDepth = mFlinger->getMinColorDepth();
         // we use the red index
-        layerRedsize = info.getSize(PixelFormatInfo::INDEX_RED);
+        int layerRedsize = info.getSize(PixelFormatInfo::INDEX_RED);
+
         mNeedsDithering = (layerRedsize > displayMinColorDepth);
-        break;
-    case 2:
-        mNeedsDithering = true;
-        break;
     }
 
     return NO_ERROR;

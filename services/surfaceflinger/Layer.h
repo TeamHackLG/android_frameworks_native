@@ -365,6 +365,7 @@ private:
     PixelFormat mFormat;
     const GLExtensions& mGLExtensions;
     bool mOpaqueLayer;
+    bool mNeedsDithering;
 
     // these are protected by an external lock
     State mCurrentState;

@@ -130,15 +130,11 @@ SurfaceFlinger::SurfaceFlinger()
         }
     }
 
-    property_get("persist.sys.use_dithering", value, "1");
-    mUseDithering = atoi(value);
-
     property_get("persist.sys.prefer_16bpp", value, "1");
     mPrefer16bpp = atoi(value);
 
     ALOGI_IF(mDebugRegion, "showupdates enabled");
     ALOGI_IF(mDebugDDMS, "DDMS debugging enabled");
-    ALOGI_IF(mUseDithering, "use dithering");
 
 #ifdef SAMSUNG_HDMI_SUPPORT
     ALOGD(">>> Run service");
@@ -454,11 +450,7 @@ void SurfaceFlinger::initializeGL(EGLDisplay display) {
     glPixelStorei(GL_PACK_ALIGNMENT, 4);
     glEnableClientState(GL_VERTEX_ARRAY);
     glShadeModel(GL_FLAT);
-    if (mUseDithering == 2) {
-        glEnable(GL_DITHER);
-    } else {
-        glDisable(GL_DITHER);
-    }
+    glDisable(GL_DITHER);
     glDisable(GL_CULL_FACE);
 
     struct pack565 {
@@ -497,7 +489,6 @@ void SurfaceFlinger::initializeGL(EGLDisplay display) {
     ALOGI("GL_MAX_TEXTURE_SIZE = %d", mMaxTextureSize);
     ALOGI("GL_MAX_VIEWPORT_DIMS = %d x %d", mMaxViewportDims[0], mMaxViewportDims[1]);
 
-    // XXX Assume bit depth for red is equal to minimum depth of all colors
     mMinColorDepth = r;
 }
 
@@ -551,6 +542,11 @@ status_t SurfaceFlinger::readyToRun()
                 hw->acquireScreen();
             }
             mDisplays.add(token, hw);
+            PixelFormatInfo info;
+            getPixelFormatInfo(mHwc->getFormat(i), &info);
+            if (!mUseDithering && info.bitsPerPixel <= 16) {
+                mUseDithering = 1;
+            }
         }
     }
 
